@@ -1,22 +1,25 @@
 package ru.practicum.shareit.user.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.ExistingCopyException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Service
+@Repository
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
-    private Long id = 1L;
     private final Map<Long, User> users = new HashMap<>();
     private final UserMapper userMapper;
+    private Long id = 1L;
 
     @Override
     public UserDto addUser(UserDto user) throws ExistingCopyException {

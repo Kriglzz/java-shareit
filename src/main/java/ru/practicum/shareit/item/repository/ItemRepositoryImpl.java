@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -14,15 +14,15 @@ import javax.validation.ValidationException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
+@Repository
 @RequiredArgsConstructor
 public class ItemRepositoryImpl implements ItemRepository {
     private final UserRepository userRepository;
-    private Long id = 1L;
     private final Map<Long, Item> items = new HashMap<>();
     private final Map<Long, List<ItemDto>> usersItems = new HashMap<>();
     private final ItemMapper itemMapper;
     private final UserMapper userMapper;
+    private Long id = 1L;
 
     @Override
     public ItemDto addItem(Long userId, ItemDto item) {

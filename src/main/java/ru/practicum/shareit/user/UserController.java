@@ -1,6 +1,8 @@
 package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -17,24 +19,52 @@ import java.util.List;
 public class UserController {
     private final UserRepository userRepository;
 
+    /*@PostMapping
+    public ResponseEntity<ResponseWrapper<UserDto>> addUser(@Valid @RequestBody UserDto userDto) {
+        UserDto user = userRepository.addUser(userDto);
+        return new ResponseEntity<>(new ResponseWrapper<>(user), HttpStatus.OK);
+    }*/
+
     @PostMapping
-    public UserDto addUser(@Valid @RequestBody UserDto user) {
-        return userRepository.addUser(user);
+    public ResponseEntity<UserDto> addUser(@Valid @RequestBody UserDto userDto) {
+        UserDto user = userRepository.addUser(userDto);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
+
+    /*@PatchMapping("/{userId}")
+    public ResponseEntity<ResponseWrapper<UserDto>> updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
+        UserDto user = userRepository.updateUser(userId, userDto);
+        return new ResponseEntity<>(new ResponseWrapper<>(user), HttpStatus.OK);
+    }*/
 
     @PatchMapping("/{userId}")
-    public UserDto updateUser(@PathVariable Long userId, @RequestBody UserDto user) {
-        return userRepository.updateUser(userId, user);
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
+        UserDto user = userRepository.updateUser(userId, userDto);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
+
+    /*@GetMapping
+    public ResponseEntity<ResponseWrapper<List<UserDto>>> getAllUsers() {
+        List<UserDto> users = userRepository.getAllUsers();
+        return new ResponseEntity<>(new ResponseWrapper<>(users), HttpStatus.FOUND);
+    }*/
 
     @GetMapping
-    public List<UserDto> getAllUsers() {
-        return userRepository.getAllUsers();
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        List<UserDto> users = userRepository.getAllUsers();
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
+ /*   @GetMapping("/{userId}")
+    public ResponseEntity<ResponseWrapper<UserDto>> getUserById(@PathVariable Long userId) {
+        UserDto user = userRepository.getUserById(userId);
+        return new ResponseEntity<>(new ResponseWrapper<>(user), HttpStatus.FOUND);
+    }*/
+
     @GetMapping("/{userId}")
-    public UserDto getUserById(@PathVariable Long userId) {
-        return userRepository.getUserById(userId);
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long userId) {
+        UserDto user = userRepository.getUserById(userId);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @DeleteMapping("/{userId}")
