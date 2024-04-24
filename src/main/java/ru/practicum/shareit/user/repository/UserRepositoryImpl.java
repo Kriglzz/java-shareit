@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ExistingCopyException;
 import ru.practicum.shareit.exception.NotFoundException;
