@@ -19,27 +19,12 @@ import java.util.List;
 public class ItemController {
     private final ItemRepository itemRepository;
 
-    /*@PostMapping
-    public ResponseEntity<ResponseWrapper<ItemDto>> addItem(@RequestHeader(name = "X-Sharer-User-Id") long userId,
-                                                            @RequestBody @Validated ItemDto itemDto) {
-        ItemDto item = itemRepository.addItem(userId, itemDto);
-        return new ResponseEntity<>(new ResponseWrapper<>(item), HttpStatus.CREATED);
-    }*/
-
     @PostMapping
     public ResponseEntity<ItemDto> addItem(@RequestHeader(name = "X-Sharer-User-Id") long userId,
                                            @RequestBody @Validated ItemDto itemDto) {
         ItemDto item = itemRepository.addItem(userId, itemDto);
         return new ResponseEntity<>(item, HttpStatus.CREATED);
     }
-
-    /*@PatchMapping("/{itemId}")
-    public ResponseEntity<ResponseWrapper<ItemDto>> updateItem(@RequestHeader(name = "X-Sharer-User-Id") long userId,
-                                                               @PathVariable("itemId") long itemId,
-                                                               @RequestBody ItemDto itemDto) {
-        ItemDto item = itemRepository.updateItem(itemId, userId, itemDto);
-        return new ResponseEntity<>(new ResponseWrapper<>(item), HttpStatus.OK);
-    }*/
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<ItemDto> updateItem(@RequestHeader(name = "X-Sharer-User-Id") long userId,
@@ -48,12 +33,6 @@ public class ItemController {
         ItemDto item = itemRepository.updateItem(itemId, userId, itemDto);
         return new ResponseEntity<>(item, HttpStatus.OK);
     }
-
-    /*@GetMapping("/{itemId}")
-    public ResponseEntity<ResponseWrapper<ItemDto>> getItemById(@PathVariable long itemId) {
-        ItemDto item = itemRepository.getItemById(itemId);
-        return new ResponseEntity<>(new ResponseWrapper<>(item), HttpStatus.FOUND);
-    }*/
 
     @GetMapping("/{itemId}")
     public ResponseEntity<ItemDto> getItemById(@PathVariable long itemId) {
@@ -65,12 +44,6 @@ public class ItemController {
     public void deleteItemById(@PathVariable Long itemId) {
         itemRepository.deleteItemById(itemId);
     }
-
-    /*@GetMapping
-    public ResponseEntity<ResponseWrapper<List<ItemDto>>> getAllUserItems(@RequestHeader(name = "X-Sharer-User-Id") long userId) {
-        List<ItemDto> items = itemRepository.getAllUserItems(userId);
-        return new ResponseEntity<>(new ResponseWrapper<>(items), HttpStatus.FOUND);
-    }*/
 
     @GetMapping
     public ResponseEntity<List<ItemDto>> getAllUserItems(@RequestHeader(name = "X-Sharer-User-Id") long userId) {
