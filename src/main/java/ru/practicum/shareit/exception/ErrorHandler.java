@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.user.UserController;
 
+import java.nio.file.AccessDeniedException;
 import java.util.Map;
 
 @RestControllerAdvice(assignableTypes = {UserController.class, ItemController.class,})
@@ -21,6 +22,12 @@ public class ErrorHandler {
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleValidationException(final RuntimeException e) {
+        return Map.of("error", e.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Map<String, String> handleAccessDeniedException(final AccessDeniedException e) {
         return Map.of("error", e.getMessage());
     }
 }
