@@ -10,6 +10,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.WrongIdException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
@@ -19,6 +20,7 @@ import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import javax.transaction.Transactional;
 import javax.validation.ValidationException;
 import java.time.LocalDate;
 import java.util.List;
@@ -41,11 +43,36 @@ public class BookingServiceImpl implements BookingService {
 
     private final UserMapper userMapper;
 
+    @Transactional
     @Override
-    public BookingDto createBooking(Long userId, Booking booking) {
+    public BookingDto createBooking(Long userId, BookingDto bookingDto) {
 
-        Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
-                new NotFoundException("Предмет с таким id не найден"));
+        /*if (booking.getItem() == null) {
+            throw new ValidationException("Предмет не указан в бронировании");
+        }*/
+        Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow(() ->
+                new NotFoundException("Предмет с id " + bookingDto.getItemId() + " не найден"));
+
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException("Пользователь с id \"" + userId + "\" не найден"));
+
+        if (Objects.equals(item.getOwner().getId(), user.getId())) {
+            throw new ValidationException("Владелец не может забронировать свой же предмет");
+        } else if (!item.getAvailable()) {
+            throw new ValidationException("Предмет с id " + item.getId() + " не доступен");
+        }
+
+        Booking booking = bookingMapper.bookingFromBookingDto(bookingDto);
+        booking.setItem(item);
+        booking.setBooker(user);
+        booking.setStatus(BookingStatus.WAITING);
+
+        Booking savedBooking = bookingRepository.save(booking);
+        return bookingMapper.bookingDtoFromBooking(savedBooking);
+
+/*
+        Item item = getItemById(booking.getItem().getId());
+
         ItemDto itemDto = itemMapper.itemDtoFromItem(item);
         checkAvailable(itemDto);
 
@@ -53,13 +80,25 @@ public class BookingServiceImpl implements BookingService {
                 new NotFoundException("Пользователь с id \"" + userId + "\" не найден"));
         UserDto userDto = userMapper.userDtoFromUser(user);
 
+        if (Objects.equals(item.getOwner().getId(), booking.getBooker().getId())) {
+            throw new NotFoundException("Владелец не может забронировать свой же предмет");
+        } else if (!item.getAvailable()) {
+            throw new ValidationException("Предмет с id " + item.getId() + " не доступен");
+        }
         booking.setItem(item);
         booking.setBooker(user);
         booking.setStatus(BookingStatus.WAITING);
         bookingRepository.save(booking);
 
-        return bookingMapper.bookingDtoFromBooking(booking);
+        return bookingMapper.bookingDtoFromBooking(booking);*/
     }
+
+    private Item getItemById(Long itemId) {
+        return itemRepository.findById(itemId).orElseThrow(
+                () -> new WrongIdException(String.format("Item %d is not exist.", itemId))
+        );
+    }
+
 
     private void checkAvailable(ItemDto itemDto) {
         if (itemDto.getAvailable() == null) {
@@ -92,7 +131,6 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
                 new NotFoundException("Бронирование с id \"" + bookingId + "\" не найдено"));
 
-        // Проверяем, имеет ли пользователь доступ к этому бронированию
         if (!userHasAccessToBooking(userId, booking)) {
             throw new AccessDeniedException("У вас нет доступа к этому бронированию");
         }

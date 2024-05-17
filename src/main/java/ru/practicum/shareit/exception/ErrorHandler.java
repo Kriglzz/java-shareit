@@ -30,4 +30,10 @@ public class ErrorHandler {
     public Map<String, String> handleAccessDeniedException(final AccessDeniedException e) {
         return Map.of("error", e.getMessage());
     }
+
+    @ExceptionHandler(WrongIdException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleWrongUserIdException(final RuntimeException e) {
+        return Map.of("error", e.getMessage());
+    }
 }
