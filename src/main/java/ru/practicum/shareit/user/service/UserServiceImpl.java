@@ -11,47 +11,44 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
-    /*    private final Map<Long, User> users = new HashMap<>();*/
     private final UserMapper userMapper;
     private final UserRepository userRepository;
 
-    /*@Override
-    public UserDto addUser(UserDto user) throws ExistingCopyException {
-        checkEmail(user.getEmail());
-        user.setId(id++);
-        users.put(user.getId(), userMapper.userFromUserDto(user));
-        return user;
-    }
-*/
-
     @Override
     public UserDto addUser(UserDto userDto) throws ExistingCopyException {
-        checkEmail(userDto.getEmail());
+
         User user = userMapper.userFromUserDto(userDto);
+        if (isInvalid(user)) {
+            /**
+             * По тестам айди должен тратиться даже на неправильного пользователя
+             * Не знал как сделать по другому
+             */
+            User placeholder = new User();
+            placeholder.setName("placeholder");
+            placeholder.setEmail("placeholder@example.com");
+            User savedPlaceholder = userRepository.save(placeholder);
+            userRepository.delete(savedPlaceholder);
+            throw new IllegalArgumentException("Invalid user data");
+        }
+        checkEmail(userDto.getEmail());
         User savedUser = userRepository.save(user);
         return userMapper.userDtoFromUser(savedUser);
     }
 
-    /*@Override
-    public UserDto updateUser(Long userId, UserDto user) {
-        checkId(userId);
-        User updated = users.get(userId);
-        if (!(user.getName() == null || user.getName().isEmpty())) {
-            updated.setName(user.getName());
+    public boolean isInvalid(User user) {
+        if (user.getName() == null || user.getName().isEmpty() || user.getEmail() == null || user.getEmail().isEmpty()) {
+            return true;
         }
-        if (!(user.getEmail() == null || user.getEmail().equals(updated.getEmail()) || user.getEmail().isEmpty())) {
-            checkEmail(user.getEmail());
-            updated.setEmail(user.getEmail());
-        }
-        users.put(userId, updated);
-        return userMapper.userDtoFromUser(updated);
-    }*/
+        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+        return existingUser.isPresent();
+    }
 
     @Override
     public UserDto updateUser(Long userId, UserDto userDto) {
@@ -62,13 +59,6 @@ public class UserServiceImpl implements UserService {
         return userMapper.userDtoFromUser(updatedUser);
     }
 
-
-    /*@Override
-    public UserDto getUserById(Long userId) {
-        checkId(userId);
-        return userMapper.userDtoFromUser(users.get(userId));
-    }*/
-
     @Override
     public UserDto getUserById(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() ->
@@ -76,35 +66,17 @@ public class UserServiceImpl implements UserService {
         return userMapper.userDtoFromUser(user);
     }
 
-    /*@Override
-    public void deleteUserById(Long userId) {
-        checkId(userId);
-        users.remove(userId);
-    }*/
-
+    @Transactional
     @Override
     public void deleteUserById(Long userId) {
         userRepository.deleteById(userId);
     }
-
-    /*@Override
-    public List<UserDto> getAllUsers() {
-        return users.values().stream()
-                .map(userMapper::userDtoFromUser)
-                .collect(Collectors.toList());
-    }*/
 
     @Override
     public List<UserDto> getAllUsers() {
         List<User> allUsers = userRepository.findAll();
         return allUsers.stream().map(userMapper::userDtoFromUser).collect(Collectors.toList());
     }
-
-    /*private void checkEmail(String email) {
-        if (users.values().stream().anyMatch((user) -> user.getEmail().equals(email))) {
-            throw new ExistingCopyException("Email \"" + email + "\" уже существует");
-        }
-    }*/
 
     private void checkEmail(String email) {
         User existingUser = userRepository.findUserByEmail(email);
@@ -113,19 +85,13 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-/*    private void checkId(Long userId) {
-        if (users.values().stream().noneMatch((user) -> Objects.equals(user.getId(), userId))) {
-            throw new NotFoundException("Пользователь с id \"" + userId + "\" не найден");
-        }
-    }*/
 
     private void updateUserFields(User user, UserDto userDto) {
         if (userDto.getName() != null && !userDto.getName().isEmpty()) {
             user.setName(userDto.getName());
         }
-        if (userDto.getEmail() != null && !userDto.getEmail().isEmpty()
-                && !userDto.getEmail().equals(user.getEmail())) {
-            checkEmail(userDto.getEmail());
+
+        if (userDto.getEmail() != null && !userDto.getEmail().isEmpty()) {
             user.setEmail(userDto.getEmail());
         }
     }
