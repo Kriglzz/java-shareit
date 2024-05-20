@@ -37,4 +37,10 @@ public class ErrorHandler {
     public Map<String, String> handleWrongUserIdException(final RuntimeException e) {
         return Map.of("error", e.getMessage());
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleIllegalStateException(final IllegalStateException e) {
+        return Map.of("error", e.getMessage());
+    }
 }
