@@ -6,9 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -36,8 +38,9 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemDto> getItemById(@PathVariable long itemId) {
-        ItemDto item = itemService.getItemById(itemId);
+    public ResponseEntity<ItemDto> getItemById(@RequestHeader(name = "X-Sharer-User-Id") long userId,
+                                               @PathVariable long itemId) {
+        ItemDto item = itemService.getItemById(userId, itemId);
         return new ResponseEntity<>(item, HttpStatus.OK);
     }
 
@@ -57,5 +60,14 @@ public class ItemController {
     public ResponseEntity<List<ItemDto>> search(@RequestParam String text) {
         List<ItemDto> searched = itemService.search(text);
         return new ResponseEntity<>(searched, HttpStatus.OK);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(
+            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @PathVariable Long itemId,
+            @RequestBody @Valid CommentDto commentDto
+    ) {
+        return itemService.addComment(itemId, userId, commentDto);
     }
 }

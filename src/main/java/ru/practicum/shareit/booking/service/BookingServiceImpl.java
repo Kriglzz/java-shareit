@@ -23,8 +23,10 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import javax.transaction.Transactional;
 import javax.validation.ValidationException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,13 +45,16 @@ public class BookingServiceImpl implements BookingService {
 
     private final UserMapper userMapper;
 
-    @Transactional
+
     @Override
     public BookingDto createBooking(Long userId, BookingDto bookingDto) {
+        System.out.println("BookingDto Start: " + bookingDto.getStart());
+        System.out.println("BookingDto End: " + bookingDto.getEnd());
 
-        /*if (booking.getItem() == null) {
-            throw new ValidationException("Предмет не указан в бронировании");
-        }*/
+        if (!bookingDto.validateDates()) {
+            throw new IllegalStateException("Ошибка даты");
+        }
+
         Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow(() ->
                 new NotFoundException("Предмет с id " + bookingDto.getItemId() + " не найден"));
 
@@ -68,37 +73,10 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(BookingStatus.WAITING);
 
         Booking savedBooking = bookingRepository.save(booking);
+        System.out.println("Start: " + booking.getStart());
+        System.out.println("End: " + booking.getEnd());
         return bookingMapper.bookingDtoFromBooking(savedBooking);
-
-/*
-        Item item = getItemById(booking.getItem().getId());
-
-        ItemDto itemDto = itemMapper.itemDtoFromItem(item);
-        checkAvailable(itemDto);
-
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException("Пользователь с id \"" + userId + "\" не найден"));
-        UserDto userDto = userMapper.userDtoFromUser(user);
-
-        if (Objects.equals(item.getOwner().getId(), booking.getBooker().getId())) {
-            throw new NotFoundException("Владелец не может забронировать свой же предмет");
-        } else if (!item.getAvailable()) {
-            throw new ValidationException("Предмет с id " + item.getId() + " не доступен");
-        }
-        booking.setItem(item);
-        booking.setBooker(user);
-        booking.setStatus(BookingStatus.WAITING);
-        bookingRepository.save(booking);
-
-        return bookingMapper.bookingDtoFromBooking(booking);*/
     }
-
-    private Item getItemById(Long itemId) {
-        return itemRepository.findById(itemId).orElseThrow(
-                () -> new WrongIdException(String.format("Item %d is not exist.", itemId))
-        );
-    }
-
 
     private void checkAvailable(ItemDto itemDto) {
         if (itemDto.getAvailable() == null) {
@@ -122,6 +100,8 @@ public class BookingServiceImpl implements BookingService {
 
             booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
             bookingRepository.save(booking);
+        System.out.println("Start: " + booking.getStart());
+        System.out.println("End: " + booking.getEnd());
 
             return bookingMapper.bookingDtoFromBooking(booking);
         }
@@ -145,36 +125,37 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getAllBooking(Long userId, String state) {
         List<Booking> bookings;
+        LocalDateTime now = LocalDateTime.now();
 
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id \"" + userId + "\" не найден"));
 
         if (state == null || state.equalsIgnoreCase("ALL")) {
-            bookings = bookingRepository.findAllByBooker(user, Sort.by(Sort.Direction.DESC, "createdAt"));
+            bookings = bookingRepository.findAllByBooker(user, Sort.by(Sort.Direction.DESC, "start"));
         } else {
 
             switch (state.toUpperCase()) {
                 case "CURRENT":
-                    bookings = bookingRepository.findAllByBookerAndStatus(user, BookingStatus.APPROVED,
-                            Sort.by(Sort.Direction.DESC, "createdAt"));
+                    bookings = bookingRepository.findAllByBookerAndStatus(user, BookingStatus.CURRENT,
+                            Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 case "PAST":
-                    bookings = bookingRepository.findAllByBookerAndStatus(user, BookingStatus.APPROVED,
-                            Sort.by(Sort.Direction.DESC, "createdAt"));
-                    bookings.removeIf(booking -> booking.getEnd().toLocalDate().isAfter(LocalDate.now()));
+                    bookings = bookingRepository.findAllByBooker(user,
+                            Sort.by(Sort.Direction.DESC, "start"));
+                    bookings.removeIf(booking -> booking.getEnd().isAfter(now));
                     break;
                 case "FUTURE":
-                    bookings = bookingRepository.findAllByBookerAndStatus(user, BookingStatus.APPROVED,
-                            Sort.by(Sort.Direction.DESC, "createdAt"));
-                    bookings.removeIf(booking -> booking.getStart().toLocalDate().isBefore(LocalDate.now()));
+                    bookings = bookingRepository.findAllByBooker(user,
+                            Sort.by(Sort.Direction.DESC, "start"));
+                    bookings.removeIf(booking -> booking.getStart().isBefore(now));
                     break;
                 case "WAITING":
                     bookings = bookingRepository.findAllByBookerAndStatus(user, BookingStatus.WAITING,
-                            Sort.by(Sort.Direction.DESC, "createdAt"));
+                            Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 case "REJECTED":
                     bookings = bookingRepository.findAllByBookerAndStatus(user, BookingStatus.REJECTED,
-                            Sort.by(Sort.Direction.DESC, "createdAt"));
+                            Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 default:
                     throw new IllegalArgumentException("Некорректное значение параметра state: " + state);
@@ -194,30 +175,30 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> bookings;
 
         if (state == null || state.equalsIgnoreCase("ALL")) {
-            bookings = bookingRepository.findAllByItemOwner(owner, Sort.by(Sort.Direction.DESC, "createdAt"));
+            bookings = bookingRepository.findAllByItemOwner(owner, Sort.by(Sort.Direction.DESC, "start"));
         } else {
             switch (state.toUpperCase()) {
                 case "CURRENT":
-                    bookings = bookingRepository.findAllByItemOwnerAndStatus(owner, BookingStatus.APPROVED,
-                            Sort.by(Sort.Direction.DESC, "createdAt"));
+                    bookings = bookingRepository.findAllByItemOwnerAndStatus(owner, BookingStatus.CURRENT,
+                            Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 case "PAST":
-                    bookings = bookingRepository.findAllByItemOwnerAndStatus(owner, BookingStatus.APPROVED,
-                            Sort.by(Sort.Direction.DESC, "createdAt"));
+                    bookings = bookingRepository.findAllByItemOwner(owner,
+                            Sort.by(Sort.Direction.DESC, "start"));
                     bookings.removeIf(booking -> booking.getEnd().toLocalDate().isAfter(LocalDate.now()));
                     break;
                 case "FUTURE":
-                    bookings = bookingRepository.findAllByItemOwnerAndStatus(owner, BookingStatus.APPROVED,
-                            Sort.by(Sort.Direction.DESC, "createdAt"));
+                    bookings = bookingRepository.findAllByItemOwner(owner,
+                            Sort.by(Sort.Direction.DESC, "start"));
                     bookings.removeIf(booking -> booking.getStart().toLocalDate().isBefore(LocalDate.now()));
                     break;
                 case "WAITING":
                     bookings = bookingRepository.findAllByItemOwnerAndStatus(owner, BookingStatus.WAITING,
-                            Sort.by(Sort.Direction.DESC, "createdAt"));
+                            Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 case "REJECTED":
                     bookings = bookingRepository.findAllByItemOwnerAndStatus(owner, BookingStatus.REJECTED,
-                            Sort.by(Sort.Direction.DESC, "createdAt"));
+                            Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 default:
                     throw new IllegalArgumentException("Некорректное значение параметра state: " + state);

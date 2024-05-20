@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.comment.dto;
+package ru.practicum.shareit.comment.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +15,6 @@ public class CommentDto {
     @NotEmpty
     private String text;
     private Long item;
-    private Long user;
+    private Long authorName;
     private LocalDateTime created;
 }
