@@ -9,16 +9,15 @@ import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.AccessDeniedException;
+import ru.practicum.shareit.exception.IllegalStateException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -35,10 +34,6 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
 
     private final BookingMapper bookingMapper;
-
-    private final ItemMapper itemMapper;
-
-    private final UserMapper userMapper;
 
 
     @Override
@@ -147,7 +142,7 @@ public class BookingServiceImpl implements BookingService {
                             Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 default:
-                    throw new IllegalArgumentException("Некорректное значение параметра state: " + state);
+                    throw new ValidationException("Unknown state: " + state);
             }
         }
 
@@ -186,7 +181,7 @@ public class BookingServiceImpl implements BookingService {
                             Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 default:
-                    throw new IllegalArgumentException("Некорректное значение параметра state: " + state);
+                    throw new ValidationException("Unknown state: " + state);
             }
         }
 
