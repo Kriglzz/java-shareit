@@ -30,10 +30,8 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "author_id")
-    private User author_id;
+    private User authorId;
 
     @CreationTimestamp
     private LocalDateTime created;
-
-
 }

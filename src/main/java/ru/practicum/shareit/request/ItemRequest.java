@@ -9,8 +9,8 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class ItemRequest {
-    private long itemRequest_id;
+    private long itemRequestId;
     private String description;
-    private Long requestor_id;
+    private Long requestorId;
     //private LocalDateTime created;
 }
