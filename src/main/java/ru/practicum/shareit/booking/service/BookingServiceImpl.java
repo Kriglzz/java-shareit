@@ -50,7 +50,7 @@ public class BookingServiceImpl implements BookingService {
                 new NotFoundException("Пользователь с id \"" + userId + "\" не найден"));
 
         if (Objects.equals(item.getOwner().getId(), user.getId())) {
-            throw new ValidationException("Владелец не может забронировать свой же предмет");
+            throw new NotFoundException("Владелец не может забронировать свой же предмет");
         } else if (!item.getAvailable()) {
             throw new ValidationException("Предмет с id " + item.getId() + " не доступен");
         }
