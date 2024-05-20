@@ -8,11 +8,11 @@ import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.comment.Comment;
+import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.comment.mapper.CommentMapper;
 import ru.practicum.shareit.comment.repository.CommentRepository;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.comment.Comment;
-import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
@@ -25,7 +25,8 @@ import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -130,7 +131,6 @@ public class ItemServiceImpl implements ItemService {
                 Booking nextBooking = bookingRepository.findFirstByItemIdAndStartAfterAndStatusIsNotOrderByEndAsc(
                         item.getId(), localDateTime, BookingStatus.REJECTED);
 
-                // Устанавливаем значения lastBooking и nextBooking в itemDto
                 itemDto.setLastBooking(lastBooking != null ? bookingMapper.bookingDtoFromBooking(lastBooking) : null);
                 itemDto.setNextBooking(nextBooking != null ? bookingMapper.bookingDtoFromBooking(nextBooking) : null);
             } else {
@@ -163,14 +163,23 @@ public class ItemServiceImpl implements ItemService {
 
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new NotFoundException("Предмет с id \"" + itemId + "\" не найден"));
-/*        bookingRepository.findFirstByBookerIdAndItemIdAndStatusEqualsAndEndIsBefore(
-                        userId, itemId, LocalDateTime.now(), BookingStatus.APPROVED)
-                .orElseThrow(() -> new ValidationException("Вы не можете оставлять отзыв к этой вещи"));*/
 
-        Comment newComment = commentMapper.commentFromCommentDto(commentDto);
+        List<Booking> bookings = bookingRepository.findByItemAndBookerAndStatus(item, user, BookingStatus.APPROVED);
+        if (bookings.isEmpty()) {
+            throw new ValidationException("Пользователь не может оставить комментарий для предмета без подтвержденного бронирования");
+        }
+
+        boolean hasPastBooking = bookings.stream().anyMatch(booking -> booking.getEnd().isBefore(LocalDateTime.now()));
+        if (!hasPastBooking) {
+            throw new ValidationException("Вы не можете оставлять отзыв к этой вещи до окончания бронирования");
+        }
+
+        Comment newComment = new Comment();
+        newComment.setText(commentDto.getText());
         newComment.setItem(item);
         newComment.setAuthor_id(user);
         newComment.setCreated(LocalDateTime.now());
+
         commentRepository.save(newComment);
 
         return commentMapper.commentDtoFromComment(newComment);

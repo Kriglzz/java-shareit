@@ -27,11 +27,9 @@ public class BookingDto {
     private UserDto booker;
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
+
     public Boolean validateDates() {
-        if (start == null || end == null || start.isAfter(end) ||
-                end.isBefore(start) || start == end || start.equals(end) || start.isBefore(LocalDateTime.now())) {
-            return false;
-        }
-        return true;
+        return start != null && end != null && !start.isAfter(end) &&
+                !end.isBefore(start) && start != end && !start.equals(end) && !start.isBefore(LocalDateTime.now());
     }
 }

@@ -10,23 +10,18 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.WrongIdException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import javax.transaction.Transactional;
 import javax.validation.ValidationException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,8 +43,6 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto createBooking(Long userId, BookingDto bookingDto) {
-        System.out.println("BookingDto Start: " + bookingDto.getStart());
-        System.out.println("BookingDto End: " + bookingDto.getEnd());
 
         if (!bookingDto.validateDates()) {
             throw new IllegalStateException("Ошибка даты");
@@ -73,8 +66,6 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(BookingStatus.WAITING);
 
         Booking savedBooking = bookingRepository.save(booking);
-        System.out.println("Start: " + booking.getStart());
-        System.out.println("End: " + booking.getEnd());
         return bookingMapper.bookingDtoFromBooking(savedBooking);
     }
 
@@ -100,8 +91,6 @@ public class BookingServiceImpl implements BookingService {
 
             booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
             bookingRepository.save(booking);
-        System.out.println("Start: " + booking.getStart());
-        System.out.println("End: " + booking.getEnd());
 
             return bookingMapper.bookingDtoFromBooking(booking);
         }
@@ -136,7 +125,7 @@ public class BookingServiceImpl implements BookingService {
 
             switch (state.toUpperCase()) {
                 case "CURRENT":
-                    bookings = bookingRepository.findAllByBookerAndStatus(user, BookingStatus.CURRENT,
+                    bookings = bookingRepository.findAllByBookerAndStartBeforeAndEndAfter(user, now, now,
                             Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 case "PAST":
@@ -173,24 +162,20 @@ public class BookingServiceImpl implements BookingService {
                 new NotFoundException("Пользователь с id \"" + userId + "\" не найден"));
 
         List<Booking> bookings;
-
+        LocalDateTime now = LocalDateTime.now();
         if (state == null || state.equalsIgnoreCase("ALL")) {
             bookings = bookingRepository.findAllByItemOwner(owner, Sort.by(Sort.Direction.DESC, "start"));
         } else {
             switch (state.toUpperCase()) {
                 case "CURRENT":
-                    bookings = bookingRepository.findAllByItemOwnerAndStatus(owner, BookingStatus.CURRENT,
+                    bookings = bookingRepository.findAllByItemOwnerAndStartBeforeAndEndAfter(owner, now, now,
                             Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 case "PAST":
-                    bookings = bookingRepository.findAllByItemOwner(owner,
-                            Sort.by(Sort.Direction.DESC, "start"));
-                    bookings.removeIf(booking -> booking.getEnd().toLocalDate().isAfter(LocalDate.now()));
+                    bookings = bookingRepository.findAllByItemOwnerAndEndBefore(owner, now, Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 case "FUTURE":
-                    bookings = bookingRepository.findAllByItemOwner(owner,
-                            Sort.by(Sort.Direction.DESC, "start"));
-                    bookings.removeIf(booking -> booking.getStart().toLocalDate().isBefore(LocalDate.now()));
+                    bookings = bookingRepository.findAllByItemOwnerAndStartAfter(owner, now, Sort.by(Sort.Direction.DESC, "start"));
                     break;
                 case "WAITING":
                     bookings = bookingRepository.findAllByItemOwnerAndStatus(owner, BookingStatus.WAITING,

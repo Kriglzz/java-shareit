@@ -3,7 +3,6 @@ package ru.practicum.shareit.booking.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
@@ -16,8 +15,6 @@ import java.time.LocalDateTime;
 /**
  * TODO Sprint add-bookings.
  */
-/*@AllArgsConstructor
-@RequiredArgsConstructor*/
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Data

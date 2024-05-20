@@ -63,11 +63,12 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto addComment(
+    public ResponseEntity<CommentDto> addComment(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long itemId,
             @RequestBody @Valid CommentDto commentDto
     ) {
-        return itemService.addComment(itemId, userId, commentDto);
+        CommentDto comment = itemService.addComment(itemId, userId, commentDto);
+        return new ResponseEntity<>(comment, HttpStatus.OK);
     }
 }
