@@ -1,10 +1,11 @@
 package ru.practicum.shareit.comment.mapper;
 
+import org.mapstruct.Mapper;
 import ru.practicum.shareit.comment.Comment;
 import ru.practicum.shareit.comment.dto.CommentDto;
 
+@Mapper(componentModel = "spring")
 public class CommentMapper {
-
 
     public Comment commentFromCommentDto(CommentDto commentDto) {
         Comment comment = new Comment();
