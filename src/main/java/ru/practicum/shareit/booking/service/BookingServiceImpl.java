@@ -73,27 +73,40 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto updateBooking(Long userId, Long bookingId, Boolean approved) {
 
-            Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
-                    new NotFoundException("Бронирование с id \"" + bookingId + "\" не найдено"));
+        userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException("Пользователь с id \"" + userId + "\" не найден"));
 
-            if (!Objects.equals(booking.getItem().getOwner().getId(), userId)) {
-                throw new AccessDeniedException("У вас нет прав на изменение этого бронирования");
-            }
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
+                new NotFoundException("Бронирование с id \"" + bookingId + "\" не найдено"));
 
-            if (approved && booking.getStatus() == BookingStatus.APPROVED) {
-                throw new IllegalStateException("Бронирование уже подтверждено");
-            }
+        itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
+                new NotFoundException("Вещь с id \"" + userId + "\" не найдена"));
 
-            booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
-            bookingRepository.save(booking);
-
-            return bookingMapper.bookingDtoFromBooking(booking);
+        if (!Objects.equals(booking.getItem().getOwner().getId(), userId)) {
+            throw new AccessDeniedException("У вас нет прав на изменение этого бронирования");
         }
+
+        if (approved && booking.getStatus() == BookingStatus.APPROVED) {
+            throw new IllegalStateException("Бронирование уже подтверждено");
+        }
+
+        booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
+        bookingRepository.save(booking);
+
+        return bookingMapper.bookingDtoFromBooking(booking);
+    }
 
     @Override
     public BookingDto getBooking(Long userId, Long bookingId) {
+
+        userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException("Пользователь с id \"" + userId + "\" не найден"));
+
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
                 new NotFoundException("Бронирование с id \"" + bookingId + "\" не найдено"));
+
+        itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
+                new NotFoundException("Вещь с id \"" + userId + "\" не найдена"));
 
         if (!userHasAccessToBooking(userId, booking)) {
             throw new AccessDeniedException("У вас нет доступа к этому бронированию");

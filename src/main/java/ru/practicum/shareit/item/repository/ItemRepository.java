@@ -10,10 +10,6 @@ import java.util.List;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
-    /*Item getItemById(Long itemId);
-        Вроде бы не нужно?
-    void deleteItemById(Long itemId);*/
-
     List<Item> findAllByOwnerId(Long ownerId, Sort sort);
 
     @Query("SELECT i FROM Item i WHERE" +

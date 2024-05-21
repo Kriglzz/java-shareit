@@ -8,7 +8,6 @@ import ru.practicum.shareit.booking.BookingController;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.user.UserController;
 
-import java.nio.file.AccessDeniedException;
 import java.util.Map;
 
 @RestControllerAdvice(assignableTypes = {UserController.class, ItemController.class, BookingController.class})
@@ -27,7 +26,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleAccessDeniedException(final AccessDeniedException e) {
         return Map.of("error", e.getMessage());
     }

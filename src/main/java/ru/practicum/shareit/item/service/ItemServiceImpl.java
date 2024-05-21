@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -27,6 +28,7 @@ import ru.practicum.shareit.user.service.UserService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,15 +83,18 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new NotFoundException("Предмет с id \"" + itemId + "\" не найден"));
         ItemDto itemDto = itemMapper.itemDtoFromItem(item);
+        LocalDateTime localDateTime = LocalDateTime.now();
         if (Objects.equals(item.getOwner().getId(), userId)) {
-            LocalDateTime localDateTime = LocalDateTime.now();
+            Optional<Booking> lastBookingOpt = bookingRepository.findFirstByItemIdAndStartBeforeAndStatusIsNotOrderByEndDesc(
+                    item.getId(), localDateTime, BookingStatus.REJECTED);
+            Optional<Booking> nextBookingOpt = bookingRepository.findFirstByItemIdAndStartAfterAndStatusIsNotOrderByEndAsc(
+                    item.getId(), localDateTime, BookingStatus.REJECTED);
 
-            Booking lastBooking = bookingRepository.findFirstByItemIdAndStartBeforeAndStatusIsNotOrderByEndDesc(
-                    item.getId(), localDateTime, BookingStatus.REJECTED);
-            Booking nextBooking = bookingRepository.findFirstByItemIdAndStartAfterAndStatusIsNotOrderByEndAsc(
-                    item.getId(), localDateTime, BookingStatus.REJECTED);
-            itemDto.setLastBooking(bookingMapper.bookingDtoFromBooking(lastBooking));
-            itemDto.setNextBooking(bookingMapper.bookingDtoFromBooking(nextBooking));
+            BookingDto lastBookingDto = lastBookingOpt.map(bookingMapper::bookingDtoFromBooking).orElse(null);
+            BookingDto nextBookingDto = nextBookingOpt.map(bookingMapper::bookingDtoFromBooking).orElse(null);
+
+            itemDto.setLastBooking(lastBookingDto);
+            itemDto.setNextBooking(nextBookingDto);
         } else {
             itemDto.setLastBooking(null);
             itemDto.setNextBooking(null);
@@ -126,13 +131,16 @@ public class ItemServiceImpl implements ItemService {
             itemDto.setComments(commentDtos);
 
             if (Objects.equals(item.getOwner().getId(), userId)) {
-                Booking lastBooking = bookingRepository.findFirstByItemIdAndStartBeforeAndStatusIsNotOrderByEndDesc(
+                Optional<Booking> lastBookingOpt = bookingRepository.findFirstByItemIdAndStartBeforeAndStatusIsNotOrderByEndDesc(
                         item.getId(), localDateTime, BookingStatus.REJECTED);
-                Booking nextBooking = bookingRepository.findFirstByItemIdAndStartAfterAndStatusIsNotOrderByEndAsc(
+                Optional<Booking> nextBookingOpt = bookingRepository.findFirstByItemIdAndStartAfterAndStatusIsNotOrderByEndAsc(
                         item.getId(), localDateTime, BookingStatus.REJECTED);
 
-                itemDto.setLastBooking(lastBooking != null ? bookingMapper.bookingDtoFromBooking(lastBooking) : null);
-                itemDto.setNextBooking(nextBooking != null ? bookingMapper.bookingDtoFromBooking(nextBooking) : null);
+                BookingDto lastBookingDto = lastBookingOpt.map(bookingMapper::bookingDtoFromBooking).orElse(null);
+                BookingDto nextBookingDto = nextBookingOpt.map(bookingMapper::bookingDtoFromBooking).orElse(null);
+
+                itemDto.setLastBooking(lastBookingDto);
+                itemDto.setNextBooking(nextBookingDto);
             } else {
                 itemDto.setLastBooking(null);
                 itemDto.setNextBooking(null);
