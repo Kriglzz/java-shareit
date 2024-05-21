@@ -79,8 +79,8 @@ public class UserServiceImpl implements UserService {
     }
 
     private void checkEmail(String email) {
-        User existingUser = userRepository.findUserByEmail(email);
-        if (existingUser != null) {
+        Optional<User> existingUser = userRepository.findUserByEmail(email);
+        if (existingUser.isPresent()) {
             throw new ExistingCopyException("Email \"" + email + "\" уже существует");
         }
     }

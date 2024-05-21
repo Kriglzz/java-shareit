@@ -1,10 +1,10 @@
 package ru.practicum.shareit.comment.mapper;
 
-import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.comment.Comment;
 import ru.practicum.shareit.comment.dto.CommentDto;
 
-@Mapper(componentModel = "spring")
+@Component
 public class CommentMapper {
 
     public Comment commentFromCommentDto(CommentDto commentDto) {
@@ -18,7 +18,7 @@ public class CommentMapper {
         commentDto.setId(comment.getId());
         commentDto.setText(comment.getText());
         commentDto.setItem(comment.getItem().getId());
-        commentDto.setAuthorName(comment.getAuthorId().getName());
+        commentDto.setAuthorName(comment.getUser().getName());
         commentDto.setCreated(comment.getCreated());
         return commentDto;
     }

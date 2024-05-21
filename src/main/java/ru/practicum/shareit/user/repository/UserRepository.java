@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    User findUserByEmail(String email);
+    Optional <User> findUserByEmail(String email);
 
     @Query(value = "SELECT COALESCE(MAX(user_id), 0) FROM users", nativeQuery = true)
     Long findMaxId();
