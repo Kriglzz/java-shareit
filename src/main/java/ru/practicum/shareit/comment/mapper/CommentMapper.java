@@ -5,6 +5,7 @@ import ru.practicum.shareit.comment.dto.CommentDto;
 
 public class CommentMapper {
 
+
     public Comment commentFromCommentDto(CommentDto commentDto) {
         Comment comment = new Comment();
         comment.setText(commentDto.getText());
