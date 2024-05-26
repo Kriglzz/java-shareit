@@ -1,21 +1,19 @@
 package ru.practicum.shareit.item.repository;
 
-import ru.practicum.shareit.item.dto.ItemDto;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
-public interface ItemRepository {
-    ItemDto addItem(Long userId, ItemDto item);
+@Repository
+public interface ItemRepository extends JpaRepository<Item, Long> {
+    List<Item> findAllByOwnerId(Long ownerId, Sort sort);
 
-    ItemDto updateItem(Long itemId, Long userId, ItemDto item);
-
-    ItemDto getItemById(Long itemId);
-
-    void deleteItemById(Long itemId);
-
-    List<ItemDto> getAllItems();
-
-    List<ItemDto> getAllUserItems(Long userId);
-
-    List<ItemDto> search(String text);
+    @Query("SELECT i FROM Item i WHERE" +
+            " (LOWER(i.name) LIKE %:string% OR LOWER(i.description) LIKE %:string%)" +
+            " AND i.available = true")
+    List<Item> findByNameOrDescriptionContainingIgnoreCase(String string);
 }
