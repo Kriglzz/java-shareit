@@ -40,6 +40,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public ItemRequestDto getById(Long userId, Long requestId) {
         checkUser(userId);
+        checkRequest(requestId);
         ItemRequest itemRequest = itemRequestRepository.findById(requestId).orElseThrow(() ->
                 new NotFoundException("Запрос с id \"" + requestId + "\" не найден"));
         return itemRequestMapper.itemRequestDtoFromItemRequest(itemRequest);
@@ -79,5 +80,10 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private User checkUser (Long userId){
         return userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id \"" + userId + "\" не найден"));
+    }
+
+    private ItemRequest checkRequest (Long reqId){
+        return itemRequestRepository.findById(reqId).orElseThrow(() ->
+                new NotFoundException("Запроса с id \"" + reqId + "\" не найден"));
     }
 }
