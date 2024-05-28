@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.comment.Comment;
+import ru.practicum.shareit.comment.model.Comment;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.comment.mapper.CommentMapper;
 import ru.practicum.shareit.comment.repository.CommentRepository;
@@ -52,7 +52,11 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemMapper.itemFromItemDto(itemDto);
         item.setOwner(userMapper.userFromUserDto(owner));
         Item savedItem = itemRepository.save(item);
-        return itemMapper.itemDtoFromItem(savedItem);
+        ItemDto savedItemDto = itemMapper.itemDtoFromItem(savedItem);
+        if (itemDto.getRequestId() != null) {
+            savedItemDto.setRequestId(itemDto.getRequestId());
+        }
+        return savedItemDto;
     }
 
     @Transactional
@@ -79,10 +83,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getItemById(Long userId, long itemId) {
+    public ItemDto getItemById(Long userId, Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new NotFoundException("Предмет с id \"" + itemId + "\" не найден"));
         ItemDto itemDto = itemMapper.itemDtoFromItem(item);
+        if (item.getItemRequest() != null) {
+            itemDto.setRequestId(item.getItemRequest().getId());
+        }
         LocalDateTime localDateTime = LocalDateTime.now();
         if (Objects.equals(item.getOwner().getId(), userId)) {
             Optional<Booking> lastBookingOpt = bookingRepository.findFirstByItemIdAndStartBeforeAndStatusIsNotOrderByEndDesc(
