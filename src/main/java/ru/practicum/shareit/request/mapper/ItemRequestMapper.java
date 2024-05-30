@@ -39,7 +39,11 @@ public class ItemRequestMapper {
     public ItemRequestDto addItems(ItemRequestDto itemRequestDto) {
         List<Item> items = itemRepository.findAllByItemRequestId(itemRequestDto.getId());
         List<ItemDto> itemDtos = items.stream()
-                .map(itemMapper::itemDtoFromItem)
+                .map(item -> {
+                    ItemDto itemDto = itemMapper.itemDtoFromItem(item);
+                    itemDto.setRequestId(item.getItemRequest().getId());
+                    return itemDto;
+                })
                 .collect(Collectors.toList());
         itemRequestDto.setItems(itemDtos);
         return itemRequestDto;
