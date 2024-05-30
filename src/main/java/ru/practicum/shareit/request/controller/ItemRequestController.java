@@ -11,6 +11,7 @@ import ru.practicum.shareit.request.service.ItemRequestService;
 
 import org.springframework.data.domain.Pageable;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/requests")
 @RequiredArgsConstructor
+@Validated
 public class ItemRequestController {
     private final ItemRequestService requestService;
 
@@ -46,11 +48,12 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
+    @Valid
     public ResponseEntity<List<ItemRequestDto>> getAllRequests(@RequestHeader(name = "X-Sharer-User-Id") long userId,
                                                                @PositiveOrZero @RequestParam(required = false,
-                                                                       defaultValue = "0") Integer from,
+                                                                       defaultValue = "0") int from,
                                                                @Positive @RequestParam(required = false,
-                                                                       defaultValue = "10") Integer size) {
+                                                                       defaultValue = "10") int size) {
         int page = from / size;
         List<ItemRequestDto> itemRequestList = requestService.getAllRequests(userId, PageRequest.of(page, size));
         return new ResponseEntity<>(itemRequestList, HttpStatus.OK);
