@@ -22,6 +22,7 @@ public class ItemRequestMapper {
     public ItemRequest itemRequestFromItemRequestDto(ItemRequestDto itemRequestDto){
         ItemRequest itemRequest = new ItemRequest();
         itemRequest.setId(itemRequestDto.getId());
+        itemRequest.setCreated(itemRequestDto.getCreated());
         itemRequest.setDescription(itemRequestDto.getDescription());
         return itemRequest;
     }
@@ -29,10 +30,14 @@ public class ItemRequestMapper {
     public ItemRequestDto itemRequestDtoFromItemRequest(ItemRequest itemRequest){
         ItemRequestDto itemRequestDto = new ItemRequestDto();
         itemRequestDto.setId(itemRequest.getId());
-        itemRequestDto.setCreated(LocalDateTime.now());
+        itemRequestDto.setCreated(itemRequest.getCreated());
         itemRequestDto.setDescription(itemRequest.getDescription());
         itemRequestDto.setRequester(itemRequest.getRequester().getId());
-        List<Item> items = itemRepository.findByItemRequestId(itemRequest.getId());
+        return itemRequestDto;
+    }
+
+    public ItemRequestDto addItems(ItemRequestDto itemRequestDto) {
+        List<Item> items = itemRepository.findAllByItemRequestId(itemRequestDto.getId());
         List<ItemDto> itemDtos = items.stream()
                 .map(itemMapper::itemDtoFromItem)
                 .collect(Collectors.toList());

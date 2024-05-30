@@ -19,6 +19,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -35,28 +37,36 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
-    private final UserService userService;
-    private final ItemMapper itemMapper;
-    private final UserMapper userMapper;
-    private final BookingMapper bookingMapper;
-    private final CommentMapper commentMapper;
-    private final ItemRepository itemRepository;
-    private final BookingRepository bookingRepository;
+
     private final UserRepository userRepository;
+
+    private final ItemMapper itemMapper;
+    private final ItemRepository itemRepository;
+
+    private final CommentMapper commentMapper;
     private final CommentRepository commentRepository;
+
+    private final BookingMapper bookingMapper;
+    private final BookingRepository bookingRepository;
+
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     public ItemDto addItem(Long userId, ItemDto itemDto) {
         checkAvailable(itemDto);
-        UserDto owner = userService.getUserById(userId);
-        Item item = itemMapper.itemFromItemDto(itemDto);
-        item.setOwner(userMapper.userFromUserDto(owner));
-        Item savedItem = itemRepository.save(item);
-        ItemDto savedItemDto = itemMapper.itemDtoFromItem(savedItem);
+        User owner = userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException("Пользователь с id \"" + userId + "\" не найден"));
+        ItemRequest request = null;
         if (itemDto.getRequestId() != null) {
-            savedItemDto.setRequestId(itemDto.getRequestId());
+            request = itemRequestRepository.findById(itemDto.getRequestId()).orElseThrow(() ->
+                    new NotFoundException("Запрос с id "+ itemDto.getRequestId() + " не найден!"));
         }
-        return savedItemDto;
+        Item item = itemMapper.itemFromItemDto(itemDto);
+        item.setOwner(owner);
+        item.setItemRequest(request);
+        itemRepository.save(item);
+        itemDto.setId(item.getId());
+        return itemDto;
     }
 
     @Transactional
@@ -121,6 +131,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getAllItems() {
         List<Item> allItems = itemRepository.findAll();
+
         return allItems.stream().map(itemMapper::itemDtoFromItem).collect(Collectors.toList());
     }
 

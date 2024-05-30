@@ -5,6 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.mapper.ItemMapper;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
@@ -31,6 +34,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public ItemRequestDto createItemRequest(Long userId, ItemRequestDto itemRequestDto) {
         User requester = checkUser(userId);
         itemRequestDto.setId(userId);
+        itemRequestDto.setCreated(LocalDateTime.now());
         ItemRequest itemRequest = itemRequestMapper.itemRequestFromItemRequestDto(itemRequestDto);
         itemRequest.setRequester(requester);
         ItemRequest savedItemRequest = itemRequestRepository.save(itemRequest);
@@ -43,7 +47,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         checkRequest(requestId);
         ItemRequest itemRequest = itemRequestRepository.findById(requestId).orElseThrow(() ->
                 new NotFoundException("Запрос с id \"" + requestId + "\" не найден"));
-        return itemRequestMapper.itemRequestDtoFromItemRequest(itemRequest);
+        ItemRequestDto itemRequestDto = itemRequestMapper.itemRequestDtoFromItemRequest(itemRequest);
+        return itemRequestMapper.addItems(itemRequestDto);
     }
 
     @Override
@@ -51,7 +56,10 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         checkUser(userId);
         List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequesterIdOrderByCreatedDesc(userId);
         return itemRequests.stream()
-                .map(itemRequestMapper::itemRequestDtoFromItemRequest)
+                .map(itemRequest -> {
+                    ItemRequestDto itemRequestDto = itemRequestMapper.itemRequestDtoFromItemRequest(itemRequest);
+                    return itemRequestMapper.addItems(itemRequestDto);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -59,23 +67,13 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         checkUser(userId);
         Page<ItemRequest> itemRequestsPage = itemRequestRepository.findAllByRequesterIdNotOrderByCreatedDesc(userId, pageRequest);
         return itemRequestsPage.stream()
-                .map(itemRequestMapper::itemRequestDtoFromItemRequest)
+                .map(itemRequest -> {
+                    ItemRequestDto itemRequestDto = itemRequestMapper.itemRequestDtoFromItemRequest(itemRequest);
+                    return itemRequestMapper.addItems(itemRequestDto);
+                })
                 .collect(Collectors.toList());
     }
 
-    /*public List<ItemRequestDto> getAllRequests(Long userId, Pageable pageRequest) {
-        checkUser(userId);
-        Page<ItemRequest> itemRequestsPage = itemRequestRepository.findAllByRequesterIdNotOrderByCreatedDesc(userId, pageRequest);
-        return itemRequestsPage.stream()
-                .map(itemRequest -> {
-                    ItemRequestDto itemRequestDto = itemRequestMapper.itemRequestDtoFromItemRequest(itemRequest);
-                    itemRequestDto.setItems(itemRequest.getItems().stream()
-                            .map(item -> new ItemDto(item.getId(), item.getName())) // здесь предполагается, что у вас есть метод для маппинга Item в ItemDto
-                            .collect(Collectors.toList()));
-                    return itemRequestDto;
-                })
-                .collect(Collectors.toList());
-    }*/
 
     private User checkUser (Long userId){
         return userRepository.findById(userId).orElseThrow(() ->
