@@ -25,6 +25,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
+@Validated
 public class ItemController {
     private final ItemService itemService;
 
@@ -56,6 +57,7 @@ public class ItemController {
     }
 
     @GetMapping
+    @Valid
     public ResponseEntity<List<ItemDto>> getAllUserItems(@RequestHeader(name = "X-Sharer-User-Id") long userId,
                                                          @PositiveOrZero @RequestParam(defaultValue = "0") int page,
                                                          @Positive @RequestParam(defaultValue = "10") int size) {
@@ -65,6 +67,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
+    @Valid
     public ResponseEntity<List<ItemDto>> search(@RequestParam String text,
                                                 @PositiveOrZero @RequestParam(defaultValue = "0") int page,
                                                 @Positive @RequestParam(defaultValue = "10") int size) {
