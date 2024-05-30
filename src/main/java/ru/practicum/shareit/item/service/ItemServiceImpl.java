@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -129,15 +130,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getAllItems() {
-        List<Item> allItems = itemRepository.findAll();
-
-        return allItems.stream().map(itemMapper::itemDtoFromItem).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ItemDto> getAllUserItems(Long userId, Sort sort) {
-        List<Item> userItems = itemRepository.findAllByOwnerId(userId, sort);
+    public List<ItemDto> getAllUserItems(Long userId, Pageable pageable) {
+        List<Item> userItems = itemRepository.findAllByOwnerId(userId, pageable);
         LocalDateTime localDateTime = LocalDateTime.now();
 
         return userItems.stream().map(item -> {
@@ -169,12 +163,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemDto> search(String text) {
+    public List<ItemDto> search(String text, Pageable pageable) {
         if (text == null || text.trim().isEmpty()) {
             return List.of();
         }
         String searchText = text.toLowerCase();
-        List<Item> searchResults = itemRepository.findByNameOrDescriptionContainingIgnoreCase(searchText);
+        List<Item> searchResults = itemRepository.findByNameOrDescriptionContainingIgnoreCase(searchText, pageable);
 
         return searchResults.stream()
                 .filter(Item::getAvailable) // Фильтруем по доступности
