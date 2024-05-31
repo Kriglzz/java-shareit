@@ -72,6 +72,7 @@ public class ItemServiceImplTest {
     @Mock
     private BookingMapper bookingMapper;
 
+
     @InjectMocks
     private ItemServiceImpl itemService;
 
@@ -80,6 +81,7 @@ public class ItemServiceImplTest {
     private Item item;
     private ItemDto itemDto;
     private ItemRequest itemRequest;
+
     @BeforeEach
     public void setUp() {
 
@@ -89,6 +91,7 @@ public class ItemServiceImplTest {
         itemDto = new ItemDto(1L, "item1", "description1",
                 true, null, null, null, null);
     }
+
     @Test
     public void testAddItem() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
@@ -220,11 +223,8 @@ public class ItemServiceImplTest {
 
         when(itemRepository.findAllByOwnerId(1L, pageable)).thenReturn(Collections.singletonList(item));
         when(commentRepository.findAllByItem(any())).thenReturn(Collections.singletonList(comment));
-/*        when(bookingRepository.findFirstByItemIdAndStartBeforeAndStatusIsNotOrderByEndDesc(
-                any(), any(), any())).thenReturn(Optional.empty());
-        when(bookingRepository.findFirstByItemIdAndStartAfterAndStatusIsNotOrderByEndAsc(
-                any(), any(), any())).thenReturn(Optional.empty());*/
         when(itemMapper.itemDtoFromItem(item)).thenReturn(new ItemDto());
+
         BookingDto phantomBookingDto = new BookingDto();
         CommentDto phantomCommentDto = new CommentDto();
         when(bookingMapper.bookingDtoFromBooking(any())).thenReturn(phantomBookingDto);
@@ -292,7 +292,7 @@ public class ItemServiceImplTest {
 
         assertEquals(createdCommentDto.getText(), result.getText());
         verify(userRepository, times(2)).findById(userId);
-        verify(itemRepository,times(2)).findById(itemId);
+        verify(itemRepository, times(2)).findById(itemId);
         verify(commentRepository).save(any(Comment.class));
         verify(commentMapper).commentDtoFromComment(any(Comment.class));
     }

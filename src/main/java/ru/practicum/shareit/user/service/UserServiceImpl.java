@@ -3,7 +3,6 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exception.ExistingCopyException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -22,7 +21,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDto addUser(UserDto userDto) throws ExistingCopyException {
+    public UserDto addUser(UserDto userDto) {
 
         User user = userMapper.userFromUserDto(userDto);
         if (isInvalid(user)) {
@@ -37,7 +36,6 @@ public class UserServiceImpl implements UserService {
             userRepository.delete(savedPlaceholder);
             throw new IllegalArgumentException("Invalid user data");
         }
-        checkEmail(userDto.getEmail());
         User savedUser = userRepository.save(user);
         return userMapper.userDtoFromUser(savedUser);
     }
@@ -76,13 +74,6 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAllUsers() {
         List<User> allUsers = userRepository.findAll();
         return allUsers.stream().map(userMapper::userDtoFromUser).collect(Collectors.toList());
-    }
-
-    private void checkEmail(String email) {
-        Optional<User> existingUser = userRepository.findUserByEmail(email);
-        if (existingUser.isPresent()) {
-            throw new ExistingCopyException("Email \"" + email + "\" уже существует");
-        }
     }
 
 

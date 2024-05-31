@@ -39,11 +39,12 @@ public class CommentRepositoryTest {
         user3 = userRepository.save(new User(3L, "user3", "user3@mail.ru"));
         item1 = itemRepository.save(new Item(1L, "item1", "description1",
                 true, user1, null, null));
-        comment1 = commentRepository.save(new Comment(1L,"comment1",item1,user2, LocalDateTime.now()));
-        comment2 = commentRepository.save(new Comment(2L,"comment2",item1,user3, LocalDateTime.now()));
+        comment1 = commentRepository.save(new Comment(1L, "comment1", item1, user2, LocalDateTime.now()));
+        comment2 = commentRepository.save(new Comment(2L, "comment2", item1, user3, LocalDateTime.now()));
     }
+
     @Test
-    public void testFindAllByItem (){
+    public void testFindAllByItem() {
         List<Comment> comments = commentRepository.findAllByItem(item1);
         assertThat(comments).containsExactly(comment1, comment2);
     }

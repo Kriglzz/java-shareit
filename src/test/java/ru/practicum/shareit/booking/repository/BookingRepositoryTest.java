@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -17,7 +16,6 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -65,7 +63,7 @@ public class BookingRepositoryTest {
     }
 
     @Test
-    void testFindAllByItemOwnerAndStatus(){
+    void testFindAllByItemOwnerAndStatus() {
         List<Booking> bookings = bookingRepository.findAllByItemOwnerAndStatus(owner, BookingStatus.APPROVED, pageable);
         assertThat(bookings).containsExactly(booking1, booking2);
     }

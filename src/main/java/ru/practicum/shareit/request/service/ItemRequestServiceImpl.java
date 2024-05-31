@@ -2,20 +2,15 @@ package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.mapper.ItemMapper;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-
-import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -75,12 +70,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
 
-    private User checkUser (Long userId){
+    private User checkUser(Long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id \"" + userId + "\" не найден"));
     }
 
-    private ItemRequest checkRequest (Long reqId){
+    private ItemRequest checkRequest(Long reqId) {
         return itemRequestRepository.findById(reqId).orElseThrow(() ->
                 new NotFoundException("Запроса с id \"" + reqId + "\" не найден"));
     }

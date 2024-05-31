@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserControllerTest {
 
     @MockBean
-     UserService userService;
+    UserService userService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -47,7 +47,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testAddUserTest() throws Exception{
+    public void testAddUserTest() throws Exception {
         when(userService.addUser(any()))
                 .thenReturn(userDto);
 
@@ -111,7 +111,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testGetUserById() throws Exception{
+    void testGetUserById() throws Exception {
         when(userService.getUserById(any(Long.class)))
                 .thenReturn(userDto);
 

@@ -1,11 +1,10 @@
 package ru.practicum.shareit.booking.repository;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -33,13 +32,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * LastBooking
      */
     Optional<Booking> findFirstByItemIdAndStartBeforeAndStatusIsNotOrderByEndDesc(Long itemId, LocalDateTime end,
-                                                                        BookingStatus status);
+                                                                                  BookingStatus status);
 
     /**
      * NextBooking
      */
     Optional<Booking> findFirstByItemIdAndStartAfterAndStatusIsNotOrderByEndAsc(Long itemId, LocalDateTime start,
-                                                                      BookingStatus status);
+                                                                                BookingStatus status);
 
     /**
      * CURRENT for owner

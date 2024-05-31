@@ -153,7 +153,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    public void testComment() throws Exception{
+    public void testComment() throws Exception {
         CommentDto commentDto = new CommentDto(1L, "comment", 1L, "author",
                 LocalDateTime.now());
         when(itemService.addComment(anyLong(), anyLong(), any()))

@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.service;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 

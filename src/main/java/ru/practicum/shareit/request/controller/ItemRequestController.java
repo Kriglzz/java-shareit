@@ -9,12 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
-import org.springframework.data.domain.Pageable;
-
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -29,7 +26,7 @@ public class ItemRequestController {
 
     @PostMapping
     public ResponseEntity<ItemRequestDto> create(@RequestHeader(name = "X-Sharer-User-Id") long userId,
-                                                        @RequestBody @Validated ItemRequestDto itemRequestDto) {
+                                                 @RequestBody @Validated ItemRequestDto itemRequestDto) {
         ItemRequestDto itemRequest = requestService.createItemRequest(userId, itemRequestDto);
         return new ResponseEntity<>(itemRequest, HttpStatus.CREATED);
     }
@@ -43,7 +40,7 @@ public class ItemRequestController {
 
     @GetMapping
     public ResponseEntity<List<ItemRequestDto>> getByOwner(@RequestHeader(name = "X-Sharer-User-Id") Long userId) {
-        List <ItemRequestDto> itemRequestList = requestService.getByOwner(userId);
+        List<ItemRequestDto> itemRequestList = requestService.getByOwner(userId);
         return new ResponseEntity<>(itemRequestList, HttpStatus.OK);
     }
 

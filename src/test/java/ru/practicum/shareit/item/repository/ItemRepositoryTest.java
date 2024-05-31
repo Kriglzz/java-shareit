@@ -1,7 +1,5 @@
 package ru.practicum.shareit.item.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +15,8 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -50,6 +50,7 @@ public class ItemRepositoryTest {
                 true, user2, null, null));
         pageable = PageRequest.of(0, 10);
     }
+
     @Test
     void testFindAllByOwnerId() {
         List<Item> itemsUser1 = itemRepository.findAllByOwnerId(user1.getId(), pageable);
@@ -77,6 +78,7 @@ public class ItemRepositoryTest {
 
         assertThat(items).hasSize(1).contains(item3);
     }
+
     @Test
     public void testFindAllByItemRequestId() {
         ItemRequest itemRequest = new ItemRequest();

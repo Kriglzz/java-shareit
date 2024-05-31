@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @WebMvcTest(controllers = ItemRequestController.class)
 
 public class ItemRequestControllerTest {
@@ -52,12 +53,12 @@ public class ItemRequestControllerTest {
                 "user2@mail.ru");
         itemDto = new ItemDto(1L, "item1", "descrirption",
                 true, null, null, null, 1L);
-        itemRequestDto = new ItemRequestDto(1L,"description", 2L,
+        itemRequestDto = new ItemRequestDto(1L, "description", 2L,
                 LocalDateTime.now(), List.of(itemDto));
     }
 
     @Test
-    public void testCreate() throws Exception{
+    public void testCreate() throws Exception {
         when(itemRequestService.createItemRequest(anyLong(), any())).thenReturn(itemRequestDto);
 
         mockMvc.perform(post("/requests")
@@ -76,7 +77,7 @@ public class ItemRequestControllerTest {
     }
 
     @Test
-    public void testGetById() throws Exception{
+    public void testGetById() throws Exception {
         when(itemRequestService.getById(any(Long.class), any(Long.class)))
                 .thenReturn(itemRequestDto);
 
@@ -96,7 +97,7 @@ public class ItemRequestControllerTest {
     }
 
     @Test
-    public void testGetByOwner () throws Exception{
+    public void testGetByOwner() throws Exception {
         when(itemRequestService.getByOwner(any(Long.class)))
                 .thenReturn(List.of(itemRequestDto));
 
@@ -116,7 +117,7 @@ public class ItemRequestControllerTest {
     }
 
     @Test
-    public void testGetAllRequests () throws Exception{
+    public void testGetAllRequests() throws Exception {
         when(itemRequestService.getAllRequests(any(Long.class), any()))
                 .thenReturn(List.of(itemRequestDto));
 
