@@ -3,6 +3,8 @@ package ru.practicum.shareit.booking.service;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -361,23 +364,59 @@ public class BookingServiceImplTest {
         });
     }
 
-    @Test
-    public void testGetAllBooking() {
+    @ParameterizedTest
+    @CsvSource({
+            "ALL, findAllByBooker",
+            "CURRENT, findAllByBookerAndStartBeforeAndEndAfter",
+            "PAST, findAllByBooker",
+            "FUTURE, findAllByBooker",
+            "WAITING, findAllByBookerAndStatus",
+            "REJECTED, findAllByBookerAndStatus"
+    })
+    public void testGetAllBooking(String state, String expectedMethod) {
         Long userId = 1L;
-        String state = "ALL";
         Pageable pageable = PageRequest.of(0, 10);
+        User user = new User(userId, "booker", "booker@mail.ru");
+        LocalDateTime now = LocalDateTime.now();
+
         List<Booking> bookings = Arrays.asList(
-                new Booking(1L, LocalDateTime.now(), LocalDateTime.now().plusDays(1), item1, booker, BookingStatus.APPROVED),
-                new Booking(2L, LocalDateTime.now().minusDays(2), LocalDateTime.now().minusDays(1), item2, booker, BookingStatus.PAST)
+                new Booking(1L, LocalDateTime.now(), LocalDateTime.now().plusDays(1), null, null, BookingStatus.APPROVED),
+                new Booking(2L, LocalDateTime.now().minusDays(2), LocalDateTime.now().minusDays(1), null, null, BookingStatus.PAST)
         );
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(new User(userId, "booker", "booker@mail.ru")));
-        when(bookingRepository.findAllByBooker(any(User.class), eq(pageable))).thenReturn(bookings);
-        when(bookingMapper.bookingDtoFromBooking(any(Booking.class))).thenReturn(bookingDto1, bookingDto2);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(bookingMapper.bookingDtoFromBooking(any(Booking.class)))
+                .thenReturn(new BookingDto(), new BookingDto());
+
+        switch (expectedMethod) {
+            case "findAllByBooker":
+                when(bookingRepository.findAllByBooker(any(User.class), eq(pageable))).thenReturn(bookings);
+                break;
+            case "findAllByBookerAndStartBeforeAndEndAfter":
+                when(bookingRepository.findAllByBookerAndStartBeforeAndEndAfter(any(User.class), any(LocalDateTime.class), any(LocalDateTime.class), eq(pageable)))
+                        .thenReturn(bookings);
+                break;
+            case "findAllByBookerAndStatus":
+                BookingStatus status = state.equalsIgnoreCase("WAITING") ? BookingStatus.WAITING : BookingStatus.REJECTED;
+                when(bookingRepository.findAllByBookerAndStatus(any(User.class), eq(status), eq(pageable)))
+                        .thenReturn(bookings);
+                break;
+        }
+
+        List<Booking> filteredBookings = bookings;
+        if (state.equalsIgnoreCase("PAST")) {
+            filteredBookings = bookings.stream()
+                    .filter(booking -> booking.getEnd().isBefore(now))
+                    .collect(Collectors.toList());
+        } else if (state.equalsIgnoreCase("FUTURE")) {
+            filteredBookings = bookings.stream()
+                    .filter(booking -> booking.getStart().isAfter(now))
+                    .collect(Collectors.toList());
+        }
 
         List<BookingDto> result = bookingService.getAllBooking(userId, state, pageable);
 
-        assertEquals(2, result.size());
+        assertEquals(filteredBookings.size(), result.size());
     }
 
     @Test
@@ -406,19 +445,52 @@ public class BookingServiceImplTest {
         });
     }
 
-    @Test
-    public void testGetAllBookingsByOwner() {
+    @ParameterizedTest
+    @CsvSource({
+            "ALL, findAllByItemOwner",
+            "CURRENT, findAllByItemOwnerAndStartBeforeAndEndAfter",
+            "PAST, findAllByItemOwnerAndEndBefore",
+            "FUTURE, findAllByItemOwnerAndStartAfter",
+            "WAITING, findAllByItemOwnerAndStatus",
+            "REJECTED, findAllByItemOwnerAndStatus"
+    })
+    public void testGetAllBookingsByOwner(String state, String expectedMethod) {
         Long userId = 1L;
-        String state = "ALL";
         Pageable pageable = PageRequest.of(0, 10);
+        User owner = new User(userId, "owner", "owner@mail.ru");
+        LocalDateTime now = LocalDateTime.now();
+
         List<Booking> bookings = Arrays.asList(
-                new Booking(1L, LocalDateTime.now(), LocalDateTime.now().plusDays(1), item1, booker, BookingStatus.APPROVED),
-                new Booking(2L, LocalDateTime.now().minusDays(2), LocalDateTime.now().minusDays(1), item2, booker, BookingStatus.PAST)
+                new Booking(1L, LocalDateTime.now(), LocalDateTime.now().plusDays(1), null, null, BookingStatus.APPROVED),
+                new Booking(2L, LocalDateTime.now().minusDays(2), LocalDateTime.now().minusDays(1), null, null, BookingStatus.PAST)
         );
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(new User(userId, "owner", "owner@mail.ru")));
-        when(bookingRepository.findAllByItemOwner(any(User.class), eq(pageable))).thenReturn(bookings);
-        when(bookingMapper.bookingDtoFromBooking(any(Booking.class))).thenReturn(bookingDto1, bookingDto2);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(owner));
+        when(bookingMapper.bookingDtoFromBooking(any(Booking.class)))
+                .thenReturn(new BookingDto(), new BookingDto());
+
+        switch (expectedMethod) {
+            case "findAllByItemOwner":
+                when(bookingRepository.findAllByItemOwner(any(User.class), eq(pageable))).thenReturn(bookings);
+                break;
+            case "findAllByItemOwnerAndStartBeforeAndEndAfter":
+                when(bookingRepository.findAllByItemOwnerAndStartBeforeAndEndAfter(any(User.class), any(LocalDateTime.class), any(LocalDateTime.class), eq(pageable)))
+                        .thenReturn(bookings);
+                break;
+            case "findAllByItemOwnerAndEndBefore":
+                when(bookingRepository.findAllByItemOwnerAndEndBefore(any(User.class), any(LocalDateTime.class), eq(pageable)))
+                        .thenReturn(bookings);
+                break;
+            case "findAllByItemOwnerAndStartAfter":
+                when(bookingRepository.findAllByItemOwnerAndStartAfter(any(User.class), any(LocalDateTime.class), eq(pageable)))
+                        .thenReturn(bookings);
+                break;
+            case "findAllByItemOwnerAndStatus":
+                BookingStatus status = state.equalsIgnoreCase("WAITING") ? BookingStatus.WAITING : BookingStatus.REJECTED;
+                when(bookingRepository.findAllByItemOwnerAndStatus(any(User.class), eq(status), eq(pageable)))
+                        .thenReturn(bookings);
+                break;
+        }
 
         List<BookingDto> result = bookingService.getAllBookingsByOwner(userId, state, pageable);
 
