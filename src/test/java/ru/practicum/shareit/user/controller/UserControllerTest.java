@@ -29,14 +29,11 @@ public class UserControllerTest {
 
     @MockBean
     UserService userService;
-
-    @Autowired
-    private MockMvc mockMvc;
-
     @Autowired
     ObjectMapper objectMapper;
-
     UserDto userDto;
+    @Autowired
+    private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {

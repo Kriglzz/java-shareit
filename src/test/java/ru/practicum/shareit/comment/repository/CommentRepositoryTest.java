@@ -17,20 +17,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 public class CommentRepositoryTest {
-    @Autowired
-    private CommentRepository commentRepository;
-    @Autowired
-    private ItemRepository itemRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
     Item item1;
     User user1;
     User user2;
     User user3;
     Comment comment1;
     Comment comment2;
+    @Autowired
+    private CommentRepository commentRepository;
+    @Autowired
+    private ItemRepository itemRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {

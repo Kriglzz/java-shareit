@@ -22,21 +22,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class ItemRepositoryTest {
 
-    @Autowired
-    private ItemRepository itemRepository;
-
-    @Autowired
-    private TestEntityManager entityManager;
-
-    @Autowired
-    private UserRepository userRepository;
-
     Item item1;
     Item item2;
     Item item3;
     User user1;
     User user2;
     Pageable pageable;
+    @Autowired
+    private ItemRepository itemRepository;
+    @Autowired
+    private TestEntityManager entityManager;
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {

@@ -28,19 +28,14 @@ import static org.mockito.Mockito.when;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserServiceImplTest {
 
+    UserDto userDto;
+    User user;
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private UserMapper userMapper;
-
     @InjectMocks
     private UserServiceImpl userService;
-
-
-    UserDto userDto;
-
-    User user;
 
     @BeforeEach
     void setUp() {
@@ -109,7 +104,6 @@ public class UserServiceImplTest {
     @Test
     void testDeleteUserById() {
         when(userMapper.userFromUserDto(userDto)).thenReturn(user);
-        ;
         userService.deleteUserById(user.getId());
         assertThrows(NotFoundException.class, () -> userService.getUserById(user.getId()));
     }

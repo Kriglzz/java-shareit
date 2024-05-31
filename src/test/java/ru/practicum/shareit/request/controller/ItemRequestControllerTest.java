@@ -34,12 +34,12 @@ public class ItemRequestControllerTest {
     ItemRequestService itemRequestService;
     @Autowired
     ObjectMapper objectMapper;
-    @Autowired
-    private MockMvc mockMvc;
     ItemRequestDto itemRequestDto;
     UserDto owner;
     UserDto requester;
     ItemDto itemDto;
+    @Autowired
+    private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
