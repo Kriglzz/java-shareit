@@ -33,11 +33,6 @@ public class ErrorHandler {
         return Map.of("error", e.getMessage());
     }
 
-    /*@ExceptionHandler(WrongIdException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleWrongUserIdException(final RuntimeException e) {
-        return Map.of("error", e.getMessage());
-    }*/
 
     @ExceptionHandler(IllegalStateException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

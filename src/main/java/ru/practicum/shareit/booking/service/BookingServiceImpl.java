@@ -12,7 +12,6 @@ import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.IllegalStateException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -62,12 +61,6 @@ public class BookingServiceImpl implements BookingService {
 
         Booking savedBooking = bookingRepository.save(booking);
         return bookingMapper.bookingDtoFromBooking(savedBooking);
-    }
-
-    private void checkAvailable(ItemDto itemDto) {
-        if (itemDto.getAvailable() == null) {
-            throw new ValidationException("Некорректноые данные. Проверьте статус \"available\"");
-        }
     }
 
     @Override
