@@ -1,18 +1,17 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.IllegalStateException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -62,12 +61,6 @@ public class BookingServiceImpl implements BookingService {
 
         Booking savedBooking = bookingRepository.save(booking);
         return bookingMapper.bookingDtoFromBooking(savedBooking);
-    }
-
-    private void checkAvailable(ItemDto itemDto) {
-        if (itemDto.getAvailable() == null) {
-            throw new ValidationException("Некорректноые данные. Проверьте статус \"available\"");
-        }
     }
 
     @Override
@@ -120,7 +113,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllBooking(Long userId, String state) {
+    public List<BookingDto> getAllBooking(Long userId, String state, Pageable pageable) {
         List<Booking> bookings;
         LocalDateTime now = LocalDateTime.now();
 
@@ -128,31 +121,31 @@ public class BookingServiceImpl implements BookingService {
                 new NotFoundException("Пользователь с id \"" + userId + "\" не найден"));
 
         if (state == null || state.equalsIgnoreCase("ALL")) {
-            bookings = bookingRepository.findAllByBooker(user, Sort.by(Sort.Direction.DESC, "start"));
+            bookings = bookingRepository.findAllByBooker(user, pageable);
         } else {
 
             switch (state.toUpperCase()) {
                 case "CURRENT":
                     bookings = bookingRepository.findAllByBookerAndStartBeforeAndEndAfter(user, now, now,
-                            Sort.by(Sort.Direction.DESC, "start"));
+                            pageable);
                     break;
                 case "PAST":
                     bookings = bookingRepository.findAllByBooker(user,
-                            Sort.by(Sort.Direction.DESC, "start"));
+                            pageable);
                     bookings.removeIf(booking -> booking.getEnd().isAfter(now));
                     break;
                 case "FUTURE":
                     bookings = bookingRepository.findAllByBooker(user,
-                            Sort.by(Sort.Direction.DESC, "start"));
+                            pageable);
                     bookings.removeIf(booking -> booking.getStart().isBefore(now));
                     break;
                 case "WAITING":
                     bookings = bookingRepository.findAllByBookerAndStatus(user, BookingStatus.WAITING,
-                            Sort.by(Sort.Direction.DESC, "start"));
+                            pageable);
                     break;
                 case "REJECTED":
                     bookings = bookingRepository.findAllByBookerAndStatus(user, BookingStatus.REJECTED,
-                            Sort.by(Sort.Direction.DESC, "start"));
+                            pageable);
                     break;
                 default:
                     throw new ValidationException("Unknown state: " + state);
@@ -165,33 +158,33 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllBookingsByOwner(Long userId, String state) {
+    public List<BookingDto> getAllBookingsByOwner(Long userId, String state, Pageable pageable) {
         User owner = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id \"" + userId + "\" не найден"));
 
         List<Booking> bookings;
         LocalDateTime now = LocalDateTime.now();
         if (state == null || state.equalsIgnoreCase("ALL")) {
-            bookings = bookingRepository.findAllByItemOwner(owner, Sort.by(Sort.Direction.DESC, "start"));
+            bookings = bookingRepository.findAllByItemOwner(owner, pageable);
         } else {
             switch (state.toUpperCase()) {
                 case "CURRENT":
                     bookings = bookingRepository.findAllByItemOwnerAndStartBeforeAndEndAfter(owner, now, now,
-                            Sort.by(Sort.Direction.DESC, "start"));
+                            pageable);
                     break;
                 case "PAST":
-                    bookings = bookingRepository.findAllByItemOwnerAndEndBefore(owner, now, Sort.by(Sort.Direction.DESC, "start"));
+                    bookings = bookingRepository.findAllByItemOwnerAndEndBefore(owner, now, pageable);
                     break;
                 case "FUTURE":
-                    bookings = bookingRepository.findAllByItemOwnerAndStartAfter(owner, now, Sort.by(Sort.Direction.DESC, "start"));
+                    bookings = bookingRepository.findAllByItemOwnerAndStartAfter(owner, now, pageable);
                     break;
                 case "WAITING":
                     bookings = bookingRepository.findAllByItemOwnerAndStatus(owner, BookingStatus.WAITING,
-                            Sort.by(Sort.Direction.DESC, "start"));
+                            pageable);
                     break;
                 case "REJECTED":
                     bookings = bookingRepository.findAllByItemOwnerAndStatus(owner, BookingStatus.REJECTED,
-                            Sort.by(Sort.Direction.DESC, "start"));
+                            pageable);
                     break;
                 default:
                     throw new ValidationException("Unknown state: " + state);

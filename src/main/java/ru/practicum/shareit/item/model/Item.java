@@ -2,8 +2,9 @@ package ru.practicum.shareit.item.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import ru.practicum.shareit.comment.Comment;
+import lombok.RequiredArgsConstructor;
+import ru.practicum.shareit.comment.model.Comment;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -12,7 +13,7 @@ import javax.persistence.*;
  * TODO Sprint add-controllers.
  */
 @AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Data
 @Entity
 @Table(name = "items")
@@ -32,7 +33,9 @@ public class Item {
     @JoinColumn(name = "owner")
     private User owner;
 
-    //private ItemRequest itemRequest;
+    @ManyToOne
+    @JoinColumn(name = "request_id")
+    private ItemRequest itemRequest;
 
     @OneToOne(mappedBy = "item", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Comment comment;

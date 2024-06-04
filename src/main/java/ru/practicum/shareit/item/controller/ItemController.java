@@ -1,7 +1,8 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -11,6 +12,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -19,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
+@Validated
 public class ItemController {
     private final ItemService itemService;
 
@@ -50,15 +54,22 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> getAllUserItems(@RequestHeader(name = "X-Sharer-User-Id") long userId) {
-        Sort sort = Sort.by(Sort.Direction.ASC, "id");
-        List<ItemDto> items = itemService.getAllUserItems(userId, sort);
+    @Valid
+    public ResponseEntity<List<ItemDto>> getAllUserItems(@RequestHeader(name = "X-Sharer-User-Id") long userId,
+                                                         @PositiveOrZero @RequestParam(defaultValue = "0") int page,
+                                                         @Positive @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<ItemDto> items = itemService.getAllUserItems(userId, pageable);
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ItemDto>> search(@RequestParam String text) {
-        List<ItemDto> searched = itemService.search(text);
+    @Valid
+    public ResponseEntity<List<ItemDto>> search(@RequestParam String text,
+                                                @PositiveOrZero @RequestParam(defaultValue = "0") int page,
+                                                @Positive @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<ItemDto> searched = itemService.search(text, pageable);
         return new ResponseEntity<>(searched, HttpStatus.OK);
     }
 
