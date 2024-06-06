@@ -40,8 +40,8 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<Object> getAllUserItems(@RequestHeader(name = "X-Sharer-User-Id") Long userId,
-                                                @RequestParam(defaultValue = "0") @Min(0) int from,
-                                                @RequestParam(defaultValue = "10") @Min(1) int size) {
+                                                  @RequestParam(defaultValue = "0") @Min(0) int from,
+                                                  @RequestParam(defaultValue = "10") @Min(1) int size) {
         return itemClient.getAllUserItems(userId, from, size);
     }
 
@@ -51,6 +51,7 @@ public class ItemController {
                                          @RequestParam(defaultValue = "10") @Min(1) int size) {
         return itemClient.search(text, from, size);
     }
+
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<Object> addComment(@RequestHeader(name = "X-Sharer-User-Id") Long userId,
                                              @PathVariable Long itemId,

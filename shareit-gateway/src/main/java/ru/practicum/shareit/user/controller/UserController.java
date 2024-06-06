@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.UserClient;
@@ -19,7 +18,7 @@ public class UserController {
     private final UserClient userClient;
 
     @PostMapping
-    public ResponseEntity<Object>  addUser(@Valid @RequestBody UserDto userDto) {
+    public ResponseEntity<Object> addUser(@Valid @RequestBody UserDto userDto) {
         return userClient.postUser(userDto);
     }
 
