@@ -6,11 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.UserClient;
 import ru.practicum.shareit.user.dto.UserDto;
 
-import javax.validation.Valid;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -18,7 +14,7 @@ public class UserController {
     private final UserClient userClient;
 
     @PostMapping
-    public ResponseEntity<Object> addUser(@Valid @RequestBody UserDto userDto) {
+    public ResponseEntity<Object> addUser(@RequestBody UserDto userDto) {
         return userClient.postUser(userDto);
     }
 
