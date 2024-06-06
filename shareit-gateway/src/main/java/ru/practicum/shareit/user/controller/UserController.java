@@ -14,14 +14,12 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("/users")
-@Slf4j
 @RequiredArgsConstructor
 public class UserController {
     private final UserClient userClient;
 
     @PostMapping
     public ResponseEntity<Object>  addUser(@Valid @RequestBody UserDto userDto) {
-        log.info("Post user with userDto={}", userDto);
         return userClient.postUser(userDto);
     }
 
@@ -32,7 +30,6 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<Object> getAllUsers() {
-        log.info("Get users");
         return userClient.getUsers();
     }
 
