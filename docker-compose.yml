@@ -4,7 +4,6 @@ services:
     build: ./shareit-gateway
     container_name: gateway
     ports:
-      - "8080:8080"
       - "8081:8081"
     depends_on:
       - server
@@ -16,7 +15,6 @@ services:
     container_name: server
     ports:
       - "9090:9090"
-      - "9091:9091"
     depends_on:
       - db
     environment:
