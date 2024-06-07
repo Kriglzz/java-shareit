@@ -21,9 +21,9 @@ services:
       - db
     environment:
       - TZ=Europe/Moscow
-   #   - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
-   #   - SPRING_DATASOURCE_USERNAME=user
-   #   - SPRING_DATASOURCE_PASSWORD=pass
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=pass
 
   db:
     image: postgres:13.7-alpine
