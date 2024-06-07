@@ -19,7 +19,8 @@ services:
       - "9091:9091"
     depends_on:
       - db
-   # environment:
+    environment:
+      - TZ=Europe/Moscow
    #   - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
    #   - SPRING_DATASOURCE_USERNAME=user
    #   - SPRING_DATASOURCE_PASSWORD=pass
