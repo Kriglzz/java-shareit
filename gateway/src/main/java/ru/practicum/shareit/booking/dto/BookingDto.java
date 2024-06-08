@@ -8,6 +8,9 @@ import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
@@ -17,7 +20,11 @@ public class BookingDto {
     private Long id;
     private Long itemId;
     private Long bookerId;
+    @FutureOrPresent
+    @NotNull
     private LocalDateTime start;
+    @Future
+    @NotNull
     private LocalDateTime end;
     private ItemDto item;
     private UserDto booker;
