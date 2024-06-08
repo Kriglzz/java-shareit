@@ -28,19 +28,19 @@ public class ItemClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> addItem(Long userId, ItemDto itemDto) {
+    public ResponseEntity<Object> addItem(long userId, ItemDto itemDto) {
         return post("", userId, itemDto);
     }
 
-    public ResponseEntity<Object> updateItem(Long itemId, Long userId, ItemDto itemDto) {
+    public ResponseEntity<Object> updateItem(long itemId, long userId, ItemDto itemDto) {
         return patch("/" + itemId, userId, itemDto);
     }
 
-    public ResponseEntity<Object> getItemById(Long userId, Long itemId) {
+    public ResponseEntity<Object> getItemById(long userId, long itemId) {
         return get("/" + userId, itemId);
     }
 
-    public ResponseEntity<Object> getAllUserItems(Long userId, int from, int size) {
+    public ResponseEntity<Object> getAllUserItems(long userId, int from, int size) {
         Map<String, Object> parameters = Map.of(
                 "from", from,
                 "size", size
@@ -57,7 +57,7 @@ public class ItemClient extends BaseClient {
         return get("/search?text={text}&from={from}&size={size}", null, parameters);
     }
 
-    public ResponseEntity<Object> addComment(Long itemId, Long userId, CommentDto commentDto) {
+    public ResponseEntity<Object> addComment(long itemId, long userId, CommentDto commentDto) {
         return post("/" + itemId + "/comment", userId, commentDto);
     }
 }

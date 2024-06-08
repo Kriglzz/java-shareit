@@ -26,19 +26,19 @@ public class ItemRequestClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> create(ItemRequestDto itemRequestDto, Long userId) {
+    public ResponseEntity<Object> create(ItemRequestDto itemRequestDto, long userId) {
         return post("", userId, itemRequestDto);
     }
 
-    public ResponseEntity<Object> getById(Long userId, Long requestId) {
+    public ResponseEntity<Object> getById(long userId, long requestId) {
         return get("/" + requestId, userId);
     }
 
-    public ResponseEntity<Object> getByOwner(Long userId) {
+    public ResponseEntity<Object> getByOwner(long userId) {
         return get("", userId);
     }
 
-    public ResponseEntity<Object> getAllRequests(Long userId, int from, int size) {
+    public ResponseEntity<Object> getAllRequests(long userId, int from, int size) {
         Map<String, Object> parameters = Map.of(
                 "from", from,
                 "size", size

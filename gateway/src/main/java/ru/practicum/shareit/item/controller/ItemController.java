@@ -20,26 +20,26 @@ public class ItemController {
     private final ItemClient itemClient;
 
     @PostMapping
-    ResponseEntity<Object> createItem(@RequestHeader(name = "X-Sharer-User-Id") @NotNull Long userId,
+    public ResponseEntity<Object> createItem(@RequestHeader(name = "X-Sharer-User-Id") @NotNull long userId,
                                       @Valid @RequestBody ItemDto itemDto) {
         return itemClient.addItem(userId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
-    public ResponseEntity<Object> updateItem(@RequestHeader(name = "X-Sharer-User-Id") @NotNull Long userId,
-                                             @PathVariable @NotNull Long itemId,
+    public ResponseEntity<Object> updateItem(@RequestHeader(name = "X-Sharer-User-Id") @NotNull long userId,
+                                             @PathVariable @NotNull long itemId,
                                              @RequestBody @NotNull ItemDto itemDto) {
         return itemClient.updateItem(itemId, userId, itemDto);
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<Object> getItemById(@RequestHeader(name = "X-Sharer-User-Id") @NotNull Long userId,
-                                              @PathVariable @NotNull Long itemId) {
+    public ResponseEntity<Object> getItemById(@RequestHeader(name = "X-Sharer-User-Id") @NotNull long userId,
+                                              @PathVariable @NotNull long itemId) {
         return itemClient.getItemById(itemId, userId);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getAllUserItems(@RequestHeader(name = "X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> getAllUserItems(@RequestHeader(name = "X-Sharer-User-Id") long userId,
                                                   @RequestParam(defaultValue = "0") @Min(0) int from,
                                                   @RequestParam(defaultValue = "10") @Min(1) int size) {
         return itemClient.getAllUserItems(userId, from, size);
@@ -53,8 +53,8 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<Object> addComment(@RequestHeader(name = "X-Sharer-User-Id") @NotNull Long userId,
-                                             @PathVariable @NotNull Long itemId,
+    public ResponseEntity<Object> addComment(@RequestHeader(name = "X-Sharer-User-Id") @NotNull long userId,
+                                             @PathVariable @NotNull long itemId,
                                              @Valid @RequestBody CommentDto commentDto) {
         return itemClient.addComment(itemId, userId, commentDto);
     }

@@ -49,7 +49,7 @@ public class ItemController {
     }
 
     @DeleteMapping("/{itemId}")
-    public void deleteItemById(@PathVariable Long itemId) {
+    public void deleteItemById(@PathVariable long itemId) {
         itemService.deleteItemById(itemId);
     }
 
@@ -74,8 +74,8 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<CommentDto> addComment(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                 @PathVariable Long itemId,
+    public ResponseEntity<CommentDto> addComment(@RequestHeader("X-Sharer-User-Id") long userId,
+                                                 @PathVariable long itemId,
                                                  @RequestBody @Valid CommentDto commentDto) {
         CommentDto comment = itemService.addComment(itemId, userId, commentDto);
         return new ResponseEntity<>(comment, HttpStatus.OK);

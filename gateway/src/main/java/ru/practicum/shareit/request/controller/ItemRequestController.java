@@ -21,24 +21,24 @@ public class ItemRequestController {
     private final ItemRequestClient itemRequestClient;
 
     @PostMapping
-    public ResponseEntity<Object> create(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> create(@RequestHeader("X-Sharer-User-Id") long userId,
                                          @Valid @RequestBody ItemRequestDto requestCreateDto) {
         return itemRequestClient.create(requestCreateDto, userId);
     }
 
     @GetMapping("/{requestId}")
-    public ResponseEntity<Object> getById(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                          @PathVariable Long requestId) {
+    public ResponseEntity<Object> getById(@RequestHeader("X-Sharer-User-Id") long userId,
+                                          @PathVariable long requestId) {
         return itemRequestClient.getById(userId, requestId);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getByOwner(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<Object> getByOwner(@RequestHeader("X-Sharer-User-Id") long userId) {
         return itemRequestClient.getByOwner(userId);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllRequests(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> getAllRequests(@RequestHeader("X-Sharer-User-Id") long userId,
                                                  @PositiveOrZero @RequestParam(defaultValue = "0") @Min(0) int from,
                                                  @Positive @RequestParam(defaultValue = "10") @Min(1) int size) {
         return itemRequestClient.getAllRequests(userId, from, size);

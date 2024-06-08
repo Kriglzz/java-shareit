@@ -23,7 +23,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<Object> updateUser(@PathVariable Long userId,
+    public ResponseEntity<Object> updateUser(@PathVariable long userId,
                                              @RequestBody UserDto user) {
         return userClient.updateUser(userId, user);
     }
@@ -34,12 +34,12 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<Object> getUserById(@PathVariable Long userId) {
+    public ResponseEntity<Object> getUserById(@PathVariable long userId) {
         return userClient.getUserById(userId);
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Object> deleteUserById(@PathVariable Long userId) {
+    public ResponseEntity<Object> deleteUserById(@PathVariable long userId) {
         return userClient.deleteUserById(userId);
     }
 }
