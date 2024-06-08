@@ -8,10 +8,10 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>shareit-gateway</artifactId>
+    <artifactId>gateway</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <name>ShareIt Gateway</name>
+    <name>gateway</name>
 
     <dependencies>
         <dependency>
