@@ -9,7 +9,6 @@ import ru.practicum.shareit.booking.BookingClient;
 import ru.practicum.shareit.booking.dto.BookingDto;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
