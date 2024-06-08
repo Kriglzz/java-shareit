@@ -18,9 +18,6 @@ import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
-/**
- * TODO Sprint add-bookings.
- */
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
