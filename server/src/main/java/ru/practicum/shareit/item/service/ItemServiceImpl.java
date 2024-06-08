@@ -25,6 +25,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -129,7 +130,7 @@ public class ItemServiceImpl implements ItemService {
         List<Item> userItems = itemRepository.findAllByOwnerId(userId, pageable);
         LocalDateTime localDateTime = LocalDateTime.now();
 
-        return userItems.stream().map(item -> {
+        List<ItemDto> itemDtos = userItems.stream().map(item -> {
             ItemDto itemDto = itemMapper.itemDtoFromItem(item);
 
             List<CommentDto> commentDtos = commentRepository.findAllByItem(item).stream()
@@ -154,6 +155,10 @@ public class ItemServiceImpl implements ItemService {
             }
             return itemDto;
         }).collect(Collectors.toList());
+
+        itemDtos.sort(Comparator.comparingLong(ItemDto::getId));
+
+        return itemDtos;
     }
 
     @Transactional(readOnly = true)
