@@ -23,7 +23,7 @@ services:
     restart: on-failure
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
-      - SPRING_DATASOURCE_USERNAME=shareit
+      - SPRING_DATASOURCE_USER=shareit
       - SPRING_DATASOURCE_PASSWORD=shareit
 
   db:
